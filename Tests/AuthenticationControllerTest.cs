@@ -1,5 +1,6 @@
 using Backend.Controllers;
 using Backend.Controllers.RequestModels;
+using Backend.Service.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,17 @@ namespace Tests
         /*Login
          * Test1: LoginRequest is null it should return badRequest("Object null")
          * Test2: Username/password is null/empty it should return badRequest("Username/password null")
-         * Test3: Username/password are correct it should return Ok("Login successfully")
+         * Test3: Credentials incorrect it should return badRequest
+         * Test4: Username/password are correct it should return Ok("Login successfully")
          */
         [Fact]
         public async void Login_LoginRequestNull()
         {
             //Arrange
             LoginRequest loginRequest =null;
-            AuthenticationController controller = new AuthenticationController();
+            IAuthenticationRL authenticationRL = new AuthenticationRL();
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
             IActionResult result = await controller.Login(loginRequest);
             //Assert
@@ -29,7 +33,9 @@ namespace Tests
         {
             //Arrange
             LoginRequest loginRequest = new LoginRequest();
-            AuthenticationController controller = new AuthenticationController();
+            IAuthenticationRL authenticationRL = new AuthenticationRL();
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
             controller.ModelState.AddModelError("UsernamePasswordNullorEmpty", "Username or password required");
             //Act
             IActionResult result = await controller.Login(loginRequest);
@@ -42,7 +48,9 @@ namespace Tests
         {
             //Arrange
             LoginRequest loginRequest = new LoginRequest("user", "pass");
-            AuthenticationController controller = new AuthenticationController();
+            IAuthenticationRL authenticationRL = new AuthenticationRL();
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
             IActionResult result = await controller.Login(loginRequest);
             //Assert
