@@ -32,6 +32,9 @@ namespace Backend.Controllers
 
             LoginResponse loginResponse = _authenticationSL.Login(request);
 
+            if (loginResponse.Success == false)
+                return BadRequest("Invalid Credentials");
+
             return Ok("Login successfully");
         }
     }

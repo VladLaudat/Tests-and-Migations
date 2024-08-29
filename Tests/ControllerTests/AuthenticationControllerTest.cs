@@ -1,13 +1,32 @@
 using Backend.Controllers;
 using Backend.Controllers.RequestModels;
+using Backend.DbContext;
 using Backend.Service.Authentication;
+using EntityFrameworkCoreMock;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace Tests
+namespace Tests.ControllerTests
 {
     public class AuthenticationControllerTest
     {
+        private BackendDBContext _dbContext;
+        public AuthenticationControllerTest()
+        {
+            List<User> usersInitialData = new List<User>()
+            {
+                new User() { Id = Guid.NewGuid(), UserName = "Test1", Password = "password1"},
+                new User() { Id = Guid.NewGuid(), UserName = "Test2", Password = "password2" },
+                new User() { Id = Guid.NewGuid(), UserName = "Test3", Password = "password3" }
+            };
+
+            DbContextMock<BackendDBContext> dbContextMock = new DbContextMock<BackendDBContext>(new DbContextOptionsBuilder<BackendDBContext>().Options);
+
+            _dbContext = dbContextMock.Object;
+
+            dbContextMock.CreateDbSetMock(temp => temp.Users, usersInitialData);
+        }
         /*Login
          * Test1: LoginRequest is null it should return badRequest("Object null")
          * Test2: Username/password is null/empty it should return badRequest("Username/password null")
@@ -18,8 +37,8 @@ namespace Tests
         public async void Login_LoginRequestNull()
         {
             //Arrange
-            LoginRequest loginRequest =null;
-            IAuthenticationRL authenticationRL = new AuthenticationRL();
+            LoginRequest loginRequest = null;
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
@@ -33,7 +52,7 @@ namespace Tests
         {
             //Arrange
             LoginRequest loginRequest = new LoginRequest();
-            IAuthenticationRL authenticationRL = new AuthenticationRL();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             controller.ModelState.AddModelError("UsernamePasswordNullorEmpty", "Username or password required");
@@ -44,11 +63,25 @@ namespace Tests
         }
 
         [Fact]
-        public async void Login_LoginRequestCorrect()
+        public async void Login_LoginRequestIncorrectCredentials()
         {
             //Arrange
             LoginRequest loginRequest = new LoginRequest("user", "pass");
-            IAuthenticationRL authenticationRL = new AuthenticationRL();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+            //Act
+            IActionResult result = await controller.Login(loginRequest);
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async void Login_LoginRequestCorrect()
+        {
+            //Arrange
+            LoginRequest loginRequest = new LoginRequest("Test1", "password1");
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
