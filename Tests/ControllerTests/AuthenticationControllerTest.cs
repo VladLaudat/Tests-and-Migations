@@ -2,16 +2,19 @@ using Backend.Controllers;
 using Backend.Controllers.RequestModels;
 using Backend.DbContext;
 using Backend.Service.Authentication;
+using Castle.Core.Configuration;
 using EntityFrameworkCoreMock;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Tests.ControllerTests
 {
     public class AuthenticationControllerTest
     {
         private BackendDBContext _dbContext;
+        private Microsoft.Extensions.Configuration.IConfiguration configuration = new ConfigurationBuilder().Build();
         public AuthenticationControllerTest()
         {
             List<User> usersInitialData = new List<User>()
@@ -39,7 +42,7 @@ namespace Tests.ControllerTests
             //Arrange
             LoginRequest loginRequest = null;
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
             IActionResult result = await controller.Login(loginRequest);
@@ -53,7 +56,7 @@ namespace Tests.ControllerTests
             //Arrange
             LoginRequest loginRequest = new LoginRequest();
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             controller.ModelState.AddModelError("UsernamePasswordNullorEmpty", "Username or password required");
             //Act
@@ -68,7 +71,7 @@ namespace Tests.ControllerTests
             //Arrange
             LoginRequest loginRequest = new LoginRequest("user", "pass");
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
             IActionResult result = await controller.Login(loginRequest);
@@ -82,7 +85,7 @@ namespace Tests.ControllerTests
             //Arrange
             LoginRequest loginRequest = new LoginRequest("Test1", "password1");
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
             AuthenticationController controller = new AuthenticationController(authenticationSL);
             //Act
             IActionResult result = await controller.Login(loginRequest);

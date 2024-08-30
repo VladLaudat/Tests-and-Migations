@@ -147,3 +147,5 @@ D:\Munca\Proiect1\Tests\bin\Debug\net8.0\Castle.Core.dll
 D:\Munca\Proiect1\Tests\bin\Debug\net8.0\EntityFrameworkCoreMock.Moq.dll
 D:\Munca\Proiect1\Tests\bin\Debug\net8.0\EntityFrameworkCoreMock.Shared.dll
 D:\Munca\Proiect1\Tests\bin\Debug\net8.0\Moq.dll
+D:\Munca\Proiect1\Tests\obj\Debug\net8.0\Tests.sourcelink.json
+D:\Munca\Proiect1\Tests\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

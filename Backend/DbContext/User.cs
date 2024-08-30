@@ -10,5 +10,6 @@ namespace Backend.DbContext
         public string UserName { get; set; }
         [StringLength(20)]
         public string Password { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }
