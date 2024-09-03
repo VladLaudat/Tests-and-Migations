@@ -30,7 +30,7 @@ namespace Backend.Controllers
                         .Select(e => e.ErrorMessage));
             }
 
-            LoginResponse loginResponse = _authenticationSL.Login(request);
+            ILoginResponse loginResponse = _authenticationSL.Login(request);
 
             if (loginResponse.Success == false)
                 return BadRequest(loginResponse);
