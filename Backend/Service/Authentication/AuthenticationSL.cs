@@ -1,5 +1,6 @@
 ﻿using Backend.Controllers.RequestModels;
 using Backend.Controllers.ResponseModels;
+using Backend.DbContext;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,9 +20,9 @@ namespace Backend.Service.Authentication
         }
         public LoginResponse Login(LoginRequest request)
         {
-            LoginResponse response = _authenticationRL.Login(request);
+            User user = _authenticationRL.Login(request.Username, request.Password);
 
-            if(response.Success)
+            if(user!=null)
             {
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])); //takes the key from appsettings.json
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256); // specifies the algorithm and key for encryption
@@ -34,7 +35,7 @@ namespace Backend.Service.Authentication
                     );
             }
 
-            return response;
+            return new LoginResponse();
         }
     }
 }

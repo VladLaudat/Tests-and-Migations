@@ -1,10 +1,11 @@
 ﻿using Backend.Controllers.RequestModels;
 using Backend.Controllers.ResponseModels;
+using Backend.DbContext;
 
 namespace Backend.Service.Authentication
 {
     public interface IAuthenticationRL
     {
-        public LoginResponse Login(LoginRequest request);
+        public User Login(string Username, string Password);
     }
 }

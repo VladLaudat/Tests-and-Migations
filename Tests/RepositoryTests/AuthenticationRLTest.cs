@@ -42,9 +42,9 @@ namespace Tests.RepositoryTests
             AuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             LoginRequest request = new LoginRequest("InvalidUsername", "InvalidPassword");
 
-            LoginResponse response = authenticationRL.Login(request);
+            User user = authenticationRL.Login("InvalidUsername", "InvalidPassword");
 
-            Assert.Equal(response.Success, false);
+            Assert.Null(user);
 
         }
 
@@ -54,9 +54,9 @@ namespace Tests.RepositoryTests
             AuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             LoginRequest request = new LoginRequest("Test1", "password1");
 
-            LoginResponse response = authenticationRL.Login(request);
+            User user = authenticationRL.Login("Test1", "password1");
 
-            Assert.Equal(response.Success, true);
+            Assert.NotNull(user);
 
         }
     }

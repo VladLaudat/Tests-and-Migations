@@ -6,7 +6,7 @@ namespace Backend.Service.Authentication
 {
     public interface IAuthenticationSL
     {
-        public LoginResponse Login(Backend.Controllers.RequestModels.LoginRequest request);
+        public ILoginResponse Login(Backend.Controllers.RequestModels.LoginRequest request);
 
     }
 }

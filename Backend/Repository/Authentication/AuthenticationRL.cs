@@ -12,18 +12,11 @@ namespace Backend.Service.Authentication
         {
             _dBContext = dBContext;
         }
-        public LoginResponse Login(LoginRequest request)
+        public User Login(string Username, string Password)
         {
-            LoginResponse response = new LoginResponse();
-
-            User user = _dBContext.Users.FirstOrDefault(u => u.UserName == request.Username && u.Password == request.Password);
+            User user = _dBContext.Users.FirstOrDefault(u => u.UserName == Username && u.Password == Password);
             
-            if(user == null)
-                response.Success = false;
-            else
-                response.Success = true;
-
-            return response;
+            return user;
         }
     }
 }
