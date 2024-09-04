@@ -9,8 +9,8 @@ function handleLoginSubmit(event)
     axios.post('http://localhost:5203/auth/login', data)
     .then(function (response) {
         console.log("Success");
-        //Cookies.set('authToken', response.data.authorizationToken, {expires: 1});
-        //setTimeout(() => {window.location.reload(false)},500);
+        Cookies.set('authToken', response.data.token, {expires: 1});
+        setTimeout(() => {window.location.reload(false)},500);
     })
     .catch(function (error) {
         console.error('Error creating post:', error);

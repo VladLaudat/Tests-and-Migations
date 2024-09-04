@@ -5,6 +5,7 @@ using Backend.DbContext;
 using Backend.Service.Authentication;
 using EntityFrameworkCoreMock;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +33,8 @@ namespace Tests.RepositoryTests
             dbContextMock.CreateDbSetMock(temp => temp.Users, usersInitialData);
         }
         /* Login
-         * Test1 : Incorrect credentials should return response with success = false
-         * Test2 : Correct credentials  should return response with success = true
+         * Test1 : Incorrect credentials should return user null
+         * Test2 : Correct credentials  should return user
          */
 
         [Fact]

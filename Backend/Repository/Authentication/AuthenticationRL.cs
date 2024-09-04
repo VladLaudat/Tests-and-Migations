@@ -1,6 +1,7 @@
 ﻿using Backend.Controllers.RequestModels;
 using Backend.Controllers.ResponseModels;
 using Backend.DbContext;
+using Microsoft.Data.SqlClient;
 
 namespace Backend.Service.Authentication
 {
@@ -15,7 +16,7 @@ namespace Backend.Service.Authentication
         public User Login(string Username, string Password)
         {
             User user = _dBContext.Users.FirstOrDefault(u => u.UserName == Username && u.Password == Password);
-            
+
             return user;
         }
     }

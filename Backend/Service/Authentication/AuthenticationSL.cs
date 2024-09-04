@@ -18,9 +18,23 @@ namespace Backend.Service.Authentication
             _configuration = configuration;
             _authenticationRL = authenticationRL;
         }
-        public LoginResponse Login(LoginRequest request)
+        public ILoginResponse Login(LoginRequest request)
         {
-            User user = _authenticationRL.Login(request.Username, request.Password);
+            LoginResponse response = new LoginResponse();
+            response.Success = false;
+            response.ErrorMessage = "Invalid credentials";
+            User user = null;
+
+            try
+            {
+                user = _authenticationRL.Login(request.Username, request.Password);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessage = "Something went wrong";
+                return response;
+            }
+            
 
             if(user!=null)
             {
@@ -29,13 +43,18 @@ namespace Backend.Service.Authentication
 
                 var secureToken = new JwtSecurityToken(_configuration["Jwt:Issuer"],
                     _configuration["Jwt:Audience"],
-                    new List<Claim>(),
+                    new List<Claim>() { new Claim("isAdmin", user.IsAdmin.ToString()) },
                   expires: DateTime.Now.AddDays(Convert.ToInt32(_configuration["Jwt:ExpiresInDays"])),
                   signingCredentials: credentials
                     );
+
+                response.ErrorMessage = null;
+                response.Success = true;
+                response.Token = new JwtSecurityTokenHandler().WriteToken(secureToken);
+                
             }
 
-            return new LoginResponse();
+            return response;
         }
     }
 }

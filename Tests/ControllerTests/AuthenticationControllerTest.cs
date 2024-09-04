@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace Tests.ControllerTests
 {
@@ -29,13 +30,25 @@ namespace Tests.ControllerTests
             _dbContext = dbContextMock.Object;
 
             dbContextMock.CreateDbSetMock(temp => temp.Users, usersInitialData);
+
+            var mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
+            mockConfiguration.SetupGet(x => x["Jwt:Issuer"]).Returns("your-issuer");
+            mockConfiguration.SetupGet(x => x["Jwt:Audience"]).Returns("your-audience");
+            mockConfiguration.SetupGet(x => x["Jwt:ExpiresInDays"]).Returns("7");
+            mockConfiguration.SetupGet(x => x["Jwt:Key"]).Returns("AuthenticationSecretKeyDuringTesting");
+
+            configuration=mockConfiguration.Object;
         }
+
+
         /*Login
          * Test1: LoginRequest is null it should return badRequest("Object null")
-         * Test2: Username/password is null/empty it should return badRequest("Username/password null")
+         * Test2: Username/password is null/empty it should return badRequest
          * Test3: Credentials incorrect it should return badRequest
          * Test4: Username/password are correct it should return Ok("Login successfully")
          */
+
+
         [Fact]
         public async void Login_LoginRequestNull()
         {
@@ -48,6 +61,9 @@ namespace Tests.ControllerTests
             IActionResult result = await controller.Login(loginRequest);
             //Assert
             Assert.IsType<BadRequestObjectResult>(result);
+
+            if (result is BadRequestObjectResult badRequest)
+                Assert.Equal(badRequest.Value, "Object null");
         }
 
         [Fact]
@@ -63,6 +79,7 @@ namespace Tests.ControllerTests
             IActionResult result = await controller.Login(loginRequest);
             //Assert
             Assert.IsType<BadRequestObjectResult>(result);
+
         }
 
         [Fact]
@@ -77,6 +94,9 @@ namespace Tests.ControllerTests
             IActionResult result = await controller.Login(loginRequest);
             //Assert
             Assert.IsType<BadRequestObjectResult>(result);
+
+            if (result is BadRequestObjectResult badRequest)
+                Assert.Equal(badRequest.Value, "Invalid credentials");
         }
 
         [Fact]

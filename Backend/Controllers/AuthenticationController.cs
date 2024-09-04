@@ -33,7 +33,7 @@ namespace Backend.Controllers
             ILoginResponse loginResponse = _authenticationSL.Login(request);
 
             if (loginResponse.Success == false)
-                return BadRequest(loginResponse);
+                return BadRequest(loginResponse.ErrorMessage);
 
             return Ok(loginResponse);
         }
