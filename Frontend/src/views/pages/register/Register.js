@@ -13,6 +13,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import handleRegisterSubmit from './hadleRegisterSubmit'
 
 const Register = () => {
   return (
@@ -22,18 +23,18 @@ const Register = () => {
           <CCol md={9} lg={7} xl={6}>
             <CCard className="mx-4">
               <CCardBody className="p-4">
-                <CForm>
+                <CForm onSubmit={handleRegisterSubmit}>
                   <h1>Register</h1>
                   <p className="text-body-secondary">Create your account</p>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilUser} />
                     </CInputGroupText>
-                    <CFormInput placeholder="Username" autoComplete="username" />
+                    <CFormInput placeholder="Username" name='username' type='username' autoComplete="username" />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>@</CInputGroupText>
-                    <CFormInput placeholder="Email" autoComplete="email" />
+                    <CFormInput placeholder="Email" name='email' type='email' autoComplete="email" />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
@@ -42,6 +43,7 @@ const Register = () => {
                     <CFormInput
                       type="password"
                       placeholder="Password"
+                      name='password'
                       autoComplete="new-password"
                     />
                   </CInputGroup>
@@ -52,6 +54,7 @@ const Register = () => {
                     <CFormInput
                       type="password"
                       placeholder="Repeat password"
+                      name='repeatPassword'
                       autoComplete="new-password"
                     />
                   </CInputGroup>

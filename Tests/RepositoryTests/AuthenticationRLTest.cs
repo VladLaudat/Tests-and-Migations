@@ -21,9 +21,9 @@ namespace Tests.RepositoryTests
         {
             List<User> usersInitialData = new List<User>()
             {
-                new User() { Id = Guid.NewGuid(), UserName = "Test1", Password = "password1", IsAdmin=true},
-                new User() { Id = Guid.NewGuid(), UserName = "Test2", Password = "password2", IsAdmin=false },
-                new User() { Id = Guid.NewGuid(), UserName = "Test3", Password = "password3", IsAdmin=false }
+                new User() { Id = Guid.NewGuid(), UserName = "Test1", Password = "password1", IsAdmin=true, Email="test1@yahoo.com"},
+                new User() { Id = Guid.NewGuid(), UserName = "Test2", Password = "password2", IsAdmin=false, Email = "test2@yahoo.com" },
+                new User() { Id = Guid.NewGuid(), UserName = "Test3", Password = "password3", IsAdmin=false, Email = "test3@yahoo.com" }
             };
 
             DbContextMock<BackendDBContext> dbContextMock = new DbContextMock<BackendDBContext>(new DbContextOptionsBuilder<BackendDBContext>().Options);
@@ -33,14 +33,14 @@ namespace Tests.RepositoryTests
             dbContextMock.CreateDbSetMock(temp => temp.Users, usersInitialData);
         }
         /* Login
-         * Test1 : Incorrect credentials should return user null
-         * Test2 : Correct credentials  should return user
+         * Test1 : Incorrect credentials => null
+         * Test2 : Correct credentials  => user
          */
 
         [Fact]
         public async void Login_IncorrectCredentials()
         {
-            AuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             LoginRequest request = new LoginRequest("InvalidUsername", "InvalidPassword");
 
             User user = authenticationRL.Login("InvalidUsername", "InvalidPassword");
@@ -52,13 +52,40 @@ namespace Tests.RepositoryTests
         [Fact]
         public async void Login_CorrectCredentials()
         {
-            AuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
             LoginRequest request = new LoginRequest("Test1", "password1");
 
             User user = authenticationRL.Login("Test1", "password1");
 
             Assert.NotNull(user);
 
+        }
+        /*Signup
+         * Test1: Email or password already exists in the database => null
+         * Test2: User added => User
+         */
+
+        [Fact]
+        public async void Signup_EmailOrPasswordAlreadyExists()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            User user = new User() { Email = "test1@yahoo.com", Password = "password1", UserName = "Test1" };
+            //Act
+            User userResponse = authenticationRL.Signup(user);
+            //Assert
+            Assert.Null(user);
+        }
+        [Fact]
+        public async void Signup_UserCorrect()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            User user = new User() { Email = "test4@yahoo.com", Password = "password4", UserName = "Test4" };
+            //Act
+            User userResponse = authenticationRL.Signup(user);
+            //Assert
+            Assert.NotNull(user);
         }
     }
 }

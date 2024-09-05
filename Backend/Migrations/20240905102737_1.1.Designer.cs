@@ -4,6 +4,7 @@ using Backend.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(BackendDBContext))]
-    partial class BackendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240905102737_1.1")]
+    partial class _11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace Backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("520a3d1d-e370-4bd9-b8cc-8f3892a11738"),
+                            Id = new Guid("83522e28-36a3-40f5-b125-38f533b75d3d"),
                             Email = "test1@yahoo.com",
                             IsAdmin = true,
                             Password = "password1",
@@ -61,7 +64,7 @@ namespace Backend.Migrations
                         },
                         new
                         {
-                            Id = new Guid("323f8a3f-509d-455b-9ab7-b6279e571ef2"),
+                            Id = new Guid("0ac8362c-d0ed-4bd5-afe5-5e4e928cd402"),
                             Email = "test2@yahoo.com",
                             IsAdmin = false,
                             Password = "password2",
@@ -69,7 +72,7 @@ namespace Backend.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8789e8a4-2bce-4114-b6b7-ceb3408404d9"),
+                            Id = new Guid("eb0c05a5-cfce-4045-ae0a-246d6155d7b2"),
                             Email = "test3@yahoo.com",
                             IsAdmin = false,
                             Password = "password3",

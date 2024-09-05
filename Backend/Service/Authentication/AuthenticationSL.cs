@@ -34,9 +34,9 @@ namespace Backend.Service.Authentication
                 response.ErrorMessage = "Something went wrong";
                 return response;
             }
-            
 
-            if(user!=null)
+
+            if (user != null)
             {
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])); //takes the key from appsettings.json
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256); // specifies the algorithm and key for encryption
@@ -51,10 +51,15 @@ namespace Backend.Service.Authentication
                 response.ErrorMessage = null;
                 response.Success = true;
                 response.Token = new JwtSecurityTokenHandler().WriteToken(secureToken);
-                
+
             }
 
             return response;
+        }
+
+        public ISignupResponse Signup(SignupRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

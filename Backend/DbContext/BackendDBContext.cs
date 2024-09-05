@@ -18,9 +18,9 @@ namespace Backend.DbContext
 
             //Seeding
             modelBuilder.Entity<User>().HasData(
-                new User() { Id = Guid.NewGuid(), UserName = "Test1", Password = "password1", IsAdmin=true},
-                new User() { Id = Guid.NewGuid(), UserName = "Test2", Password = "password2", IsAdmin=false },
-                new User() { Id = Guid.NewGuid(), UserName = "Test3", Password = "password3", IsAdmin=false }
+                new User() { Id = Guid.NewGuid(), UserName = "Test1", Password = "password1", IsAdmin=true, Email="test1@yahoo.com"},
+                new User() { Id = Guid.NewGuid(), UserName = "Test2", Password = "password2", IsAdmin=false, Email = "test2@yahoo.com" },
+                new User() { Id = Guid.NewGuid(), UserName = "Test3", Password = "password3", IsAdmin=false, Email = "test3@yahoo.com" }
                 );
         }
     }

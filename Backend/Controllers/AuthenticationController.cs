@@ -37,5 +37,11 @@ namespace Backend.Controllers
 
             return Ok(loginResponse);
         }
+
+        [Route("signup")]
+        public async Task<IActionResult> Signup([FromForm] SignupRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -7,5 +7,6 @@ namespace Backend.Service.Authentication
     public interface IAuthenticationRL
     {
         public User Login(string Username, string Password);
+        public User Signup(User user);
     }
 }

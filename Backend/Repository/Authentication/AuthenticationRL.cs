@@ -19,5 +19,10 @@ namespace Backend.Service.Authentication
 
             return user;
         }
+
+        public User Signup(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
