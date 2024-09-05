@@ -20,7 +20,7 @@ namespace Backend.Service.Authentication
         }
         public ILoginResponse Login(LoginRequest request)
         {
-            LoginResponse response = new LoginResponse();
+            ILoginResponse response = new LoginResponse();
             response.Success = false;
             response.ErrorMessage = "Invalid credentials";
             User user = null;
@@ -59,7 +59,30 @@ namespace Backend.Service.Authentication
 
         public ISignupResponse Signup(SignupRequest request)
         {
-            throw new NotImplementedException();
+            ISignupResponse response = new SignupResponse();
+            response.Success = false;
+            response.ErrorMessage = "Email or username already registered";
+            User userResponse = null;
+
+            User user = new User() { Id=Guid.NewGuid(), Email = request.Email, Password = request.Password, UserName = request.Username, IsAdmin=false};
+
+            try
+            {
+                userResponse = _authenticationRL.Signup(user);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessage = "Something went wrong";
+                return response;
+            }
+
+            if(userResponse != null)
+            {
+                response.Success = true;
+                response.ErrorMessage = null;
+            }
+
+            return response;
         }
     }
 }

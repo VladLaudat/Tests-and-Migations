@@ -41,7 +41,22 @@ namespace Backend.Controllers
         [Route("signup")]
         public async Task<IActionResult> Signup([FromForm] SignupRequest request)
         {
-            throw new NotImplementedException();
+            if (request == null)
+                return BadRequest("Object null");
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+            }
+
+            ISignupResponse signupResponse = _authenticationSL.Signup(request);
+
+            if(signupResponse.Success == false)
+                return BadRequest(signupResponse.ErrorMessage);
+
+            return Ok(signupResponse);
         }
     }
 }

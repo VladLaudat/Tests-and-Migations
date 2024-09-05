@@ -61,31 +61,31 @@ namespace Tests.RepositoryTests
 
         }
         /*Signup
-         * Test1: Email or password already exists in the database => null
+         * Test1: Email or username already exists in the database => null
          * Test2: User added => User
          */
 
         [Fact]
-        public async void Signup_EmailOrPasswordAlreadyExists()
+        public async void Signup_EmailOrUsernameAlreadyExists()
         {
             //Arrange
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            User user = new User() { Email = "test1@yahoo.com", Password = "password1", UserName = "Test1" };
+            User user = new User() { Id = Guid.NewGuid(), IsAdmin = false, Email = "test1@yahoo.com", Password = "password1", UserName = "Test1" };
             //Act
             User userResponse = authenticationRL.Signup(user);
             //Assert
-            Assert.Null(user);
+            Assert.Null(userResponse);
         }
         [Fact]
         public async void Signup_UserCorrect()
         {
             //Arrange
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            User user = new User() { Email = "test4@yahoo.com", Password = "password4", UserName = "Test4" };
+            User user = new User() { Id=Guid.NewGuid(), IsAdmin=false, Email = "test4@yahoo.com", Password = "password4", UserName = "Test4" };
             //Act
             User userResponse = authenticationRL.Signup(user);
             //Assert
-            Assert.NotNull(user);
+            Assert.NotNull(userResponse);
         }
     }
 }

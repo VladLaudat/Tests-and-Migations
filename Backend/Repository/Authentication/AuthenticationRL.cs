@@ -2,6 +2,7 @@
 using Backend.Controllers.ResponseModels;
 using Backend.DbContext;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Backend.Service.Authentication
 {
@@ -22,7 +23,21 @@ namespace Backend.Service.Authentication
 
         public User Signup(User user)
         {
-            throw new NotImplementedException();
+            User alreadyExistingUser = _dBContext.Users.FirstOrDefault(u => u.UserName == user.UserName || u.Email == user.Email);
+
+            if (alreadyExistingUser != null)
+                return null;
+
+            try
+            {
+                _dBContext.Add(user);
+                _dBContext.SaveChanges();
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

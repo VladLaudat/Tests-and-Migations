@@ -98,7 +98,7 @@ namespace Tests.ServiceTests
         }
         /*Signup
          * Test1 : Exception regarding dbContext =>  Response.ErrorMessage("Something went wrong")
-         * Test2 : Request wrong, user null => Response.ErrorMessage("Email or password already registered")
+         * Test2 : Request wrong, user null => Response.ErrorMessage("Email or username already registered")
          * Test3 : Request correct => Response.success(true) 
          */
 
@@ -135,7 +135,7 @@ namespace Tests.ServiceTests
             ISignupResponse signupResponse = authenticationSL.Signup(signupRequest);
 
             Assert.Equal(signupResponse.Success, false);
-            Assert.Equal(signupResponse.ErrorMessage, "Email or password already registered");
+            Assert.Equal(signupResponse.ErrorMessage, "Email or username already registered");
         }
         [Fact]
         public async void Signup_RequestCorrect()
