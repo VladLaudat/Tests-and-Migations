@@ -39,5 +39,21 @@ namespace Backend.Service.Authentication
                 throw ex;
             }
         }
+
+        string IAuthenticationRL.GetPassword(string email)
+        {
+            User user = _dBContext.Users.FirstOrDefault(u => u.Email == email);
+            if(user!=null)
+                return user.Password;
+            return null;
+        }
+
+        string IAuthenticationRL.GetUserName(string email)
+        {
+            User user = _dBContext.Users.FirstOrDefault(u => u.Email == email);
+            if (user!=null) 
+                return user.UserName;
+            return null;
+        }
     }
 }

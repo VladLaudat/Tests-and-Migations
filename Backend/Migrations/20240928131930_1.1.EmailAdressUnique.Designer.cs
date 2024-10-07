@@ -4,6 +4,7 @@ using Backend.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(BackendDBContext))]
-    partial class BackendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240928131930_1.1.EmailAdressUnique")]
+    partial class _11EmailAdressUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +51,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserName", "Email")
+                    b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
@@ -56,7 +59,7 @@ namespace Backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ce1b5797-5960-49f5-a4d5-5b24b899de37"),
+                            Id = new Guid("a57cc43d-1d79-496f-a1ea-3eb0e553a396"),
                             Email = "test1@yahoo.com",
                             IsAdmin = true,
                             Password = "password1",
@@ -64,7 +67,7 @@ namespace Backend.Migrations
                         },
                         new
                         {
-                            Id = new Guid("daf2d4e3-a84c-4324-8a6a-6fd70a631007"),
+                            Id = new Guid("c1c911ba-8b15-449f-ae46-b873a27129a2"),
                             Email = "test2@yahoo.com",
                             IsAdmin = false,
                             Password = "password2",
@@ -72,7 +75,7 @@ namespace Backend.Migrations
                         },
                         new
                         {
-                            Id = new Guid("532e6206-8f6c-4698-96c8-8d1d05696f0b"),
+                            Id = new Guid("27bff935-3583-4120-ae10-a43be1210ea9"),
                             Email = "test3@yahoo.com",
                             IsAdmin = false,
                             Password = "password3",

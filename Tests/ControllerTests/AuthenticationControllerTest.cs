@@ -9,7 +9,10 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
+using System.Diagnostics.Metrics;
 
 namespace Tests.ControllerTests
 {
@@ -17,6 +20,7 @@ namespace Tests.ControllerTests
     {
         private BackendDBContext _dbContext;
         private Microsoft.Extensions.Configuration.IConfiguration configuration = new ConfigurationBuilder().Build();
+        private IServiceProvider _serviceProvider;
         public AuthenticationControllerTest()
         {
             List<User> usersInitialData = new List<User>()
@@ -39,6 +43,17 @@ namespace Tests.ControllerTests
             mockConfiguration.SetupGet(x => x["Jwt:Key"]).Returns("AuthenticationSecretKeyDuringTesting");
 
             configuration=mockConfiguration.Object;
+
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.test.json", optional: false, reloadOnChange: true);
+
+            configuration = builder.Build();
+
+            var services = new ServiceCollection();
+            services.Configure<MailSettings>(configuration.GetSection("EmailConfiguration"));
+
+            _serviceProvider = services.BuildServiceProvider();
         }
 
 
@@ -183,6 +198,124 @@ namespace Tests.ControllerTests
             //Assert
             Assert.IsType<OkObjectResult>(result);
 
+        }
+        /*RecoverUsername
+         * Test1: Email null => BadRequest object null
+         * Test2: Email not having email format => BadRequest Bad email format
+         * Test3: Email correct => Ok
+         */
+        [Fact]
+        public async void RecoverUsername_EmailNull()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = null };
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+
+            //Act
+            IActionResult result = await controller.RecoverUsername(request);
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+
+            if (result is BadRequestObjectResult badRequestObjectResult)
+                Assert.Equal(badRequestObjectResult.Value, "Email null");
+        }
+
+        [Fact]
+        public async void RecoverUsername_EmailBadFormat()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "email" };
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+            controller.ModelState.AddModelError("EmailBadFormat", "Enter a valid email");
+
+            //Act
+            IActionResult result = await controller.RecoverUsername(request);
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+
+            if (result is BadRequestObjectResult badRequestObjectResult)
+                Assert.Equal(badRequestObjectResult.Value, "Enter a valid email");
+        }
+        [Fact]
+        public async void RecoverUsername_EmailCorrect()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+
+            //Act
+            IActionResult result = await controller.RecoverUsername(request);
+
+            //Assert
+            Assert.IsType<OkObjectResult>(result);
+        }
+        /*RecoverPassword
+         * Test1: Email null => BadRequest object null
+         * Test2: Email not having email format => BadRequest Bad email format
+         * Test3: Email correct => Ok
+         */
+        [Fact]
+        public async void RecoverPassword_EmailNull()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = null };
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+
+            //Act
+            IActionResult result = await controller.RecoverPassword(request);
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+
+            if (result is BadRequestObjectResult badRequestObjectResult)
+                Assert.Equal(badRequestObjectResult.Value, "Email null");
+        }
+
+        [Fact]
+        public async void RecoverPassword_EmailBadFormat()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "email" };
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(configuration, authenticationRL);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+            controller.ModelState.AddModelError("EmailBadFormat", "Enter a valid email");
+
+            //Act
+            IActionResult result = await controller.RecoverPassword(request);
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+
+            if (result is BadRequestObjectResult badRequestObjectResult)
+                Assert.Equal(badRequestObjectResult.Value, "Enter a valid email");
+        }
+        [Fact]
+        public async void RecoverPassword_EmailCorrect()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            AuthenticationController controller = new AuthenticationController(authenticationSL);
+
+            //Act
+            IActionResult result = await controller.RecoverPassword(request);
+
+            //Assert
+            Assert.IsType<OkObjectResult>(result);
         }
     }
 }

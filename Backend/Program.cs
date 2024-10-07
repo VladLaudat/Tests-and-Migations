@@ -27,6 +27,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IAuthenticationSL, AuthenticationSL>();
 builder.Services.AddScoped<IAuthenticationRL, AuthenticationRL>();
 
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("EmailConfiguration"));
+
 builder.Services.AddDbContext<BackendDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);

@@ -87,5 +87,59 @@ namespace Tests.RepositoryTests
             //Assert
             Assert.NotNull(userResponse);
         }
+        /*Recover Username
+         * Test1: Email parameter does not exist in database => null
+         * Test2: Email exists => User.Username of type string
+         */
+        [Fact]
+        public async void GetUsername_EmailDoesntExist()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "notexistingemail@yahoo.com";
+            //Act
+            string response = authenticationRL.GetUserName(Email);
+            //Assert
+            Assert.Null(response);
+        }
+        [Fact]
+        public async void GetUsername_Correct()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "test1@yahoo.com";
+            //Act
+            string response = authenticationRL.GetUserName(Email);
+            //Assert
+            Assert.NotNull(response);
+            Assert.IsType<string>(response);
+        }
+        /*Recover Password
+         * Test1: Email parameter does not exist in database => null
+         * Test2: Email exists => User.Password of type string
+         */
+        [Fact]
+        public async void GetPassword_EmailDoesntExist()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "notexistingemail@yahoo.com";
+            //Act
+            string response = authenticationRL.GetPassword(Email);
+            //Assert
+            Assert.Null(response);
+        }
+        [Fact]
+        public async void GetPassword_Correct()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "test1@yahoo.com";
+            //Act
+            string response = authenticationRL.GetPassword(Email);
+            //Assert
+            Assert.NotNull(response);
+            Assert.IsType<string>(response);
+        }
     }
 }

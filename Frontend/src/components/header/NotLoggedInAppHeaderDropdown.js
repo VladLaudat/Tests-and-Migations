@@ -25,11 +25,11 @@ const NotLoggedInAppHeaderDropdown = () => {
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
-        <CDropdownItem href="#/login">
+        <CDropdownItem href="/login">
           <CIcon icon={cilToggleOn} className="me-2" />
           Log In
         </CDropdownItem>
-        <CDropdownItem href="#/register">
+        <CDropdownItem href="/register">
           <CIcon icon={cilClipboard} className="me-2" />
           Register
         </CDropdownItem>

@@ -2,9 +2,12 @@
 using Backend.Controllers.ResponseModels;
 using Backend.DbContext;
 using Backend.Service.Authentication;
+using Castle.Core.Configuration;
 using EntityFrameworkCoreMock;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +20,8 @@ namespace Tests.ServiceTests
     public class AuthenticationSLTest
     {
         private BackendDBContext _dbContext;
-        private Microsoft.Extensions.Configuration.IConfiguration configuration = new ConfigurationBuilder().Build();
+        private Microsoft.Extensions.Configuration.IConfiguration configuration;
+        private ServiceProvider _serviceProvider;
         public AuthenticationSLTest()
         {
             List<User> usersInitialData = new List<User>()
@@ -33,13 +37,24 @@ namespace Tests.ServiceTests
 
             dbContextMock.CreateDbSetMock(temp => temp.Users, usersInitialData);
 
-            var mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.test.json", optional: false, reloadOnChange: true);
+            
+            configuration = builder.Build();
+
+            var services = new ServiceCollection();
+            services.Configure<MailSettings>(configuration.GetSection("EmailConfiguration"));
+
+            _serviceProvider = services.BuildServiceProvider();
+
+            /*var mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
             mockConfiguration.SetupGet(x => x["Jwt:Issuer"]).Returns("your-issuer");
             mockConfiguration.SetupGet(x => x["Jwt:Audience"]).Returns("your-audience");
             mockConfiguration.SetupGet(x => x["Jwt:ExpiresInDays"]).Returns("7");
             mockConfiguration.SetupGet(x => x["Jwt:Key"]).Returns("AuthenticationSecretKeyDuringTesting");
 
-            configuration = mockConfiguration.Object;
+            configuration = mockConfiguration.Object;*/
         }
 
         /*Login
@@ -152,6 +167,159 @@ namespace Tests.ServiceTests
             ISignupResponse signupResponse = authenticationSL.Signup(signupRequest);
 
             Assert.Equal(signupResponse.Success, true);
+        }
+        /*RecoverPassword
+         * Test1: Exception when trying to find mail => Response.ErrorMessage("Something went wrong");
+         * Test2: Mail not found => Response.ErrorMessage("Email not registered");
+         * Test3: Exception when trying to send mail => Response.ErrorMessage("Something went wrong");
+         * Test4: Email correct => Response.success(true)
+         */
+        [Fact]
+        public async void RecoverPassword_ExceptionDB()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            _dbContext = null;
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL,options);
+            //Act
+            IRecoveryPasswordResponse response = authenticationSL.RecoverPassword(request);
+            //Assert
+            Assert.Equal(response.Success, false);
+            Assert.Equal(response.Error, "Something went wrong");
+        }
+
+        [Fact]
+        public async void RecoverPassword_EmailNotFound()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test20@yahoo.com" };
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            //Act
+            IRecoveryPasswordResponse response = authenticationSL.RecoverPassword(request);
+            //Assert
+            Assert.Equal(response.Success, false);
+            Assert.Equal(response.Error, "Email not registered");
+        }
+
+        [Fact]
+        public async void RecoverPassword_EmailSendingException()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            var mockOptions = new Mock<IOptions<MailSettings>>();
+            var mailSettings = new MailSettings
+            {
+                // Set your desired values here
+                SmtpServer = "wrong",
+                Port = 587,
+                From = "wrong",
+                UserName = "wrong",
+                Password="Wrongpassword",
+                UseSSL = true
+            };
+            mockOptions.Setup(o => o.Value).Returns(mailSettings);
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, mockOptions.Object);
+            //Act
+            IRecoveryPasswordResponse response = authenticationSL.RecoverPassword(request);
+            //Assert
+            Assert.Equal(response.Success, false);
+            Assert.Equal(response.Error, "Something went wrong");
+        }
+
+        [Fact]
+        public async void RecoverPassword_EmailCorrect()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            //Act
+            IRecoveryPasswordResponse response = authenticationSL.RecoverPassword(request);
+            //Assert
+            Assert.Equal(response.Success, true);
+        }
+
+        /*RecoverPassword
+         * Test1: Exception when trying to find mail => Response.ErrorMessage("Something went wrong");
+         * Test2: Mail not found => Response.ErrorMessage("Email not registered");
+         * Test3: Exception when trying to send mail => Response.ErrorMessage("Something went wrong");
+         * Test4: Email correct => Response.success(true)
+         */
+        [Fact]
+        public async void RecoverUserName_ExceptionDB()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            _dbContext = null;
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            //Act
+            IRecoveryUsernameResponse response = authenticationSL.RecoverUsername(request);
+            //Assert
+            Assert.Equal(response.Success, false);
+            Assert.Equal(response.Error, "Something went wrong");
+        }
+
+        [Fact]
+        public async void RecoverUsername_EmailNotFound()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test20@yahoo.com" };
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            //Act
+            IRecoveryUsernameResponse response = authenticationSL.RecoverUsername(request);
+            //Assert
+            Assert.Equal(response.Success, false);
+            Assert.Equal(response.Error, "Email not registered");
+        }
+
+        [Fact]
+        public async void RecoverUserName_EmailSendingException()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            var mockOptions = new Mock<IOptions<MailSettings>>();
+            var mailSettings = new MailSettings
+            {
+                // Set your desired values here
+                SmtpServer = "wrong",
+                Port = 587,
+                From = "wrong",
+                UserName = "wrong",
+                Password = "Wrongpassword",
+                UseSSL = true
+            };
+            mockOptions.Setup(o => o.Value).Returns(mailSettings);
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, mockOptions.Object);
+            //Act
+            IRecoveryUsernameResponse response = authenticationSL.RecoverUsername(request);
+            //Assert
+            Assert.Equal(response.Success, false);
+            Assert.Equal(response.Error, "Something went wrong");
+        }
+
+        [Fact]
+        public async void RecoverUserName_EmailCorrect()
+        {
+            //Arrange
+            RecoveryRequest request = new RecoveryRequest() { Email = "test1@yahoo.com" };
+            var options = _serviceProvider.GetService<IOptions<MailSettings>>();
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
+            //Act
+            IRecoveryUsernameResponse response = authenticationSL.RecoverUsername(request);
+            //Assert
+            Assert.Equal(response.Success, true);
         }
     }
 }

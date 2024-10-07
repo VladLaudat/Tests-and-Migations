@@ -1,7 +1,13 @@
 ﻿using Backend.Controllers.RequestModels;
 using Backend.Controllers.ResponseModels;
 using Backend.DbContext;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit;
+using MimeKit.Text;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,12 +18,27 @@ namespace Backend.Service.Authentication
     {
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationRL _authenticationRL;
+        private readonly MailSettings _mailSettings = null;
 
         public AuthenticationSL(IConfiguration configuration, IAuthenticationRL authenticationRL)
         {
             _configuration = configuration;
             _authenticationRL = authenticationRL;
         }
+
+        public AuthenticationSL(IAuthenticationRL authenticationRL, IOptions<MailSettings> options)
+        {
+            _authenticationRL = authenticationRL;
+            _mailSettings = options.Value;
+        }
+
+        public AuthenticationSL(IConfiguration configuration, IAuthenticationRL authenticationRL, IOptions<MailSettings> options)
+        {
+            _configuration = configuration;
+            _authenticationRL = authenticationRL;
+            _mailSettings = options.Value;
+        }
+
         public ILoginResponse Login(LoginRequest request)
         {
             ILoginResponse response = new LoginResponse();
@@ -83,6 +104,109 @@ namespace Backend.Service.Authentication
             }
 
             return response;
+        }
+
+        public IRecoveryPasswordResponse RecoverPassword(RecoveryRequest request)
+        {
+            IRecoveryPasswordResponse response = new RecoveryPasswordResponse();
+            response.Success = true;
+            //Password generation
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+";
+            Random random = new Random();
+            string password = new string(Enumerable.Repeat(validChars, 8)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            string getPass=null;
+
+            //Check if email exists
+            try
+            {
+                getPass = _authenticationRL.GetPassword(request.Email);
+            }
+            catch
+            {
+                response.Error = "Something went wrong";
+                response.Success = false;
+                return response;
+            }
+            if (getPass == null)
+            {
+                response.Success = false;
+                response.Error = "Email not registered";
+                return response;
+            }
+            //Setting up mail
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress("server",_mailSettings.From));
+            email.To.Add(new MailboxAddress("user", request.Email));
+            email.Subject = "Password Recovery";
+            email.Body = new TextPart(TextFormat.Html) { Text = "You have requested password recovery, the new password is: " + password };
+
+            //Sending mail
+            try
+            {
+                using var smtp = new SmtpClient();
+                smtp.Connect(_mailSettings.SmtpServer, _mailSettings.Port, SecureSocketOptions.StartTls);
+                smtp.Authenticate(_mailSettings.UserName, _mailSettings.Password);
+                smtp.Send(email);
+                smtp.Disconnect(true);
+            }
+            catch (Exception ex)
+            {
+                response.Error = "Something went wrong";
+                response.Success = false;
+            }
+            return response;
+            
+        }
+
+        public IRecoveryUsernameResponse RecoverUsername(RecoveryRequest request)
+        {
+            IRecoveryUsernameResponse response = new RecoveryUsernameResponse();
+            response.Success = true;
+           
+            string getUserName = null;
+
+            //Check if email exists
+            try
+            {
+                getUserName = _authenticationRL.GetUserName(request.Email);
+            }
+            catch
+            {
+                response.Error = "Something went wrong";
+                response.Success = false;
+                return response;
+            }
+            if (getUserName == null)
+            {
+                response.Success = false;
+                response.Error = "Email not registered";
+                return response;
+            }
+            //Setting up mail
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress("server", _mailSettings.From));
+            email.To.Add(new MailboxAddress("user", request.Email));
+            email.Subject = "Password Recovery";
+            email.Body = new TextPart(TextFormat.Html) { Text = "You have requested username recovery, your username is: " + getUserName };
+
+            //Sending mail
+            try
+            {
+                using var smtp = new SmtpClient();
+                smtp.Connect(_mailSettings.SmtpServer, _mailSettings.Port, SecureSocketOptions.StartTls);
+                smtp.Authenticate(_mailSettings.UserName, _mailSettings.Password);
+                smtp.Send(email);
+                smtp.Disconnect(true);
+            }
+            catch (Exception ex)
+            {
+                response.Error = "Something went wrong";
+                response.Success = false;
+            }
+            return response;
+
         }
     }
 }

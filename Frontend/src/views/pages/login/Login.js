@@ -25,7 +25,7 @@ const Login = () => {
           <CCol md={8}>
             <CCardGroup>
               <CCard className="p-4">
-                <CCardBody>
+                <CCardBody className='align-items-center'>
                   <CForm onSubmit={handleLoginSubmit}>
                     <h1>Login</h1>
                     <p className="text-body-secondary">Sign In to your account</p>
@@ -46,24 +46,33 @@ const Login = () => {
                         autoComplete="current-password"
                       />
                     </CInputGroup>
-                    <CRow>
+                    <CRow className='align-items-center'>
                       <CCol xs={6}>
                         <CButton type='submit' color="primary" className="px-4">
                           Login
                         </CButton>
                       </CCol>
                       <CCol xs={6} className="text-right">
+                        <Link to="/recoverPassword">
                         <CButton color="link" className="px-0">
                           Forgot password?
                         </CButton>
-                      </CCol>
+                        </Link>
+                        
+                        <Link to="/recoverUsername">
+                        <CButton color="link" className="px-0">
+                          Forgot username?
+                        </CButton>
+                        </Link>
+                        </CCol>
+                      
                     </CRow>
                   </CForm>
                 </CCardBody>
               </CCard>
               <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
+                <CCardBody className='p-4'>
+                  <div className="text-center">
                     <h2>Sign up</h2>
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod

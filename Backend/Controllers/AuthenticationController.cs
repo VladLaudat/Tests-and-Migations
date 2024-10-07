@@ -58,5 +58,39 @@ namespace Backend.Controllers
 
             return Ok(signupResponse);
         }
+        [Route("recoverPassword")]
+        public async Task<IActionResult> RecoverPassword([FromForm] RecoveryRequest request)
+        {
+            if (request == null || request.Email ==null)
+                return BadRequest("Email null");
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(string.Join(",",ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)));
+            }
+            IRecoveryPasswordResponse response = _authenticationSL.RecoverPassword(request);
+            if (!response.Success)
+                return BadRequest(response.Error);
+            return Ok(response);
+        }
+        [Route("recoverUsername")]
+        public async Task<IActionResult> RecoverUsername([FromForm] RecoveryRequest request)
+        {
+            if (request == null || request.Email==null)
+                return BadRequest("Email null");
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(string.Join(",",ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)));
+            }
+            IRecoveryUsernameResponse response = _authenticationSL.RecoverUsername(request);
+            if (!response.Success)
+                return BadRequest(response.Error);
+            return Ok(response);
+        }
     }
 }
