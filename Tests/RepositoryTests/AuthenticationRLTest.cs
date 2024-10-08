@@ -87,7 +87,7 @@ namespace Tests.RepositoryTests
             //Assert
             Assert.NotNull(userResponse);
         }
-        /*Recover Username
+        /*Get Username
          * Test1: Email parameter does not exist in database => null
          * Test2: Email exists => User.Username of type string
          */
@@ -114,7 +114,7 @@ namespace Tests.RepositoryTests
             Assert.NotNull(response);
             Assert.IsType<string>(response);
         }
-        /*Recover Password
+        /*Get Password
          * Test1: Email parameter does not exist in database => null
          * Test2: Email exists => User.Password of type string
          */
@@ -140,6 +140,44 @@ namespace Tests.RepositoryTests
             //Assert
             Assert.NotNull(response);
             Assert.IsType<string>(response);
+        }
+
+        /*Set Password
+         * Test1: Email parameter does not exist in database => false
+         * Test2: Password that you want to change with is null => false
+         * Test3: Email exists, password correct => true
+         */
+        [Fact]
+        public async void SetPassword_EmailDoesntExist()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "notexistingemail@yahoo.com";
+            //Act
+            bool response = authenticationRL.SetPassword(Email, "newPassword");
+            //Assert
+            Assert.False(response);
+        }
+        public async void SetPassword_PasswordIsNull()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "test1@yahoo.com";
+            //Act
+            bool response = authenticationRL.SetPassword(Email, null);
+            //Assert
+            Assert.False(response);
+        }
+        [Fact]
+        public async void SetPassword_Correct()
+        {
+            //Arrange
+            IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
+            string Email = "test1@yahoo.com";
+            //Act
+            bool response = authenticationRL.SetPassword(Email, "newPassword");
+            //Assert
+            Assert.True(response);
         }
     }
 }

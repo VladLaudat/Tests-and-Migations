@@ -47,6 +47,14 @@ namespace Backend.Service.Authentication
                 return user.Password;
             return null;
         }
+        bool IAuthenticationRL.SetPassword(string email, string newPassword)
+        {
+            if (newPassword == null) return false;
+            User user = _dBContext.Users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+                { user.Password = newPassword; _dBContext.SaveChanges(); return true; }
+            return false;
+        }
 
         string IAuthenticationRL.GetUserName(string email)
         {

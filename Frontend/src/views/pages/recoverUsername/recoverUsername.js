@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from 'react-router-dom'
 import { CCard, CContainer, CForm, CFormInput, CInputGroup, CInputGroupText, CRow, CCol, CButton } from "@coreui/react"
+import handleRecoverUsernameSubmit from "./handleRecoverUsernameSubmit"
 
 const recoverUsername = () => {
     return (
@@ -9,7 +10,7 @@ const recoverUsername = () => {
             <CRow className="justify-content-center">
                 <CCol md={9} lg={7} xl={6}>
                     <CCard className="p-4">
-                        <CForm>
+                        <CForm onSubmit={handleRecoverUsernameSubmit}>
                             <h1>Recover username</h1>
                             <p className="text-body-secondary mb-0  ">Introduce your email in the box below</p>
                             <p className="text-body-secondary mt-0">If the email exists we will send you the username </p>

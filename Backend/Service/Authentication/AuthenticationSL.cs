@@ -3,6 +3,7 @@ using Backend.Controllers.ResponseModels;
 using Backend.DbContext;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
@@ -122,17 +123,22 @@ namespace Backend.Service.Authentication
             try
             {
                 getPass = _authenticationRL.GetPassword(request.Email);
+                if (getPass == null)
+                {
+                    response.Success = false;
+                    response.Error = "Email not registered";
+                    return response;
+                }
+                if (!_authenticationRL.SetPassword(request.Email, password))
+                {
+                    throw new Exception("Couldn't change password");
+                }
             }
-            catch
+            catch(Exception ex)
             {
-                response.Error = "Something went wrong";
+                response.Error = ex.Message;
+                if(ex is SqlException sqlException) response.Error = "Database error";
                 response.Success = false;
-                return response;
-            }
-            if (getPass == null)
-            {
-                response.Success = false;
-                response.Error = "Email not registered";
                 return response;
             }
             //Setting up mail
@@ -154,6 +160,7 @@ namespace Backend.Service.Authentication
             catch (Exception ex)
             {
                 response.Error = "Something went wrong";
+                _authenticationRL.SetPassword(request.Email, getPass);
                 response.Success = false;
             }
             return response;

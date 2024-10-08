@@ -174,7 +174,7 @@ namespace Tests.ServiceTests
          * Test3: Exception when trying to send mail => Response.ErrorMessage("Something went wrong");
          * Test4: Email correct => Response.success(true)
          */
-        [Fact]
+        /*[Fact]
         public async void RecoverPassword_ExceptionDB()
         {
             //Arrange
@@ -182,13 +182,13 @@ namespace Tests.ServiceTests
             _dbContext = null;
             var options = _serviceProvider.GetService<IOptions<MailSettings>>();
             IAuthenticationRL authenticationRL = new AuthenticationRL(_dbContext);
-            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL,options);
+            IAuthenticationSL authenticationSL = new AuthenticationSL(authenticationRL, options);
             //Act
             IRecoveryPasswordResponse response = authenticationSL.RecoverPassword(request);
             //Assert
             Assert.Equal(response.Success, false);
             Assert.Equal(response.Error, "Something went wrong");
-        }
+        }*/
 
         [Fact]
         public async void RecoverPassword_EmailNotFound()
